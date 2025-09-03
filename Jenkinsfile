@@ -38,10 +38,3 @@ pipeline {
         }
     }
 
-    post {
-        always {
-            echo "Pipeline finished. Current Docker containers:"
-            sh 'docker ps -a'
-        }
-    }
-}
