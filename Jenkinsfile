@@ -6,13 +6,14 @@ pipeline {
         APP_VERSION = "latest"
     }
 
-  stage('Checkout') {
-    steps {
-        git branch: 'main',
-            url: 'https://github.com/Naveen1-6/Indie_Gems_Portal.git',            
-    }
-}
-       stage('Build with Maven') {
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'main', url: 'https://github.com/Naveen1-6/Indie_Gems_Portal.git'
+            }
+        }
+
+        stage('Build with Maven') {
             steps {
                 sh 'mvn clean package -DskipTests'
             }
@@ -26,14 +27,22 @@ pipeline {
 
         stage('Run Container') {
             steps {
-                // Stop and remove if already exists
-                sh '''
-                if [ "$(docker ps -aq -f name=${APP_NAME})" ]; then
-                    docker rm -f ${APP_NAME} || true
-                fi
-                docker run -d --name ${APP_NAME} -p 5151:8080 ${APP_NAME}:${APP_VERSION}
-                '''
+                script {
+                    sh """
+                        if [ "\$(docker ps -aq -f name=${APP_NAME})" ]; then
+                            docker rm -f ${APP_NAME} || true
+                        fi
+                        docker run -d --name ${APP_NAME} -p 5152:8080 ${APP_NAME}:${APP_VERSION}
+                    """
+                }
             }
+        }
+    }
+
+    post {
+        always {
+            echo "Pipeline finished. Current Docker containers:"
+            sh 'docker ps -a'
         }
     }
 }
