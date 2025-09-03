@@ -6,14 +6,14 @@ pipeline {
         APP_VERSION = "latest"
     }
 
-    stages {
-        stage('Checkout') {
-            steps {
-                git branch: 'main', url: 'https://github.com/your-username/Indie_Gems_Portal.git'
-            }
-        }
-
-        stage('Build with Maven') {
+  stage('Checkout') {
+    steps {
+        git branch: 'main',
+            url: 'https://github.com/Naveen1-6/Indie_Gems_Portal.git',
+            
+    }
+}
+       stage('Build with Maven') {
             steps {
                 sh 'mvn clean package -DskipTests'
             }
