@@ -10,7 +10,6 @@ pipeline {
         stage('Checkout') {
             steps {
                 git branch: 'main', url: 'https://github.com/Naveen1-6/Indie_Gems_Portal.git'
-            }
         }
 
         stage('Build with Maven') {
