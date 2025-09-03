@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         APP_NAME = "indie-gems-portal"
-        APP_VERSION = "latest"
+        DOCKER_IMAGE = "${APP_NAME}:latest"
     }
 
     stages {
@@ -13,39 +13,28 @@ pipeline {
             }
         }
 
-    stage('Build with Maven') {
-    steps {
-        dir('Indie_Gems_Portal') {   
-            sh 'mvn clean package -DskipTests'
+        stage('Build with Maven') {
+            steps {
+                // 👇 Run Maven from the repo root (where pom.xml exists)
+                sh 'ls -l'    // helpful for debugging
+                sh 'mvn clean package -DskipTests'
+            }
         }
-    }
-}
-
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t ${APP_NAME}:${APP_VERSION} .'
+                sh "docker build -t ${DOCKER_IMAGE} ."
             }
         }
 
         stage('Run Container') {
             steps {
                 sh '''
-                    if [ "$(docker ps -aq -f name=${APP_NAME})" ]; then
-                        docker rm -f ${APP_NAME} || true
-                    fi
-                    docker run -d --name ${APP_NAME} -p 6166:8080 ${APP_NAME}:${APP_VERSION}
+                docker rm -f ${APP_NAME} || true
+                docker run -d --name ${APP_NAME} -p 8088:8080 ${DOCKER_IMAGE}
                 '''
             }
         }
     }
 
-    post {
-        always {
-            echo "Pipeline finished. Current Docker containers:"
-            sh 'docker ps -a'
-        }
-    }
-}
-
-
+    
